@@ -13,12 +13,12 @@ jobs:
     permissions:
       contents: read
 
-  #sca:
-  #  uses: ./.github/workflows/sca.yml
-  #  needs: [ sbom ]
-  #  with:
-  #    sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
-  #  permissions:
-  #    contents: read
+  sca:
+    uses: ./.github/workflows/sca.yml
+    needs: [ sbom ]
+    with:
+      sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
+    permissions:
+      contents: read
 
 
