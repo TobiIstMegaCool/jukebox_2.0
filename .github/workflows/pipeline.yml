@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/sca.yml
     needs: [ sbom ]
     with:
-      sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
+      sbom_artifact: "sbom_${{ github.run_id }}"
     permissions:
       contents: read
 
