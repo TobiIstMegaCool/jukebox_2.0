@@ -12,7 +12,7 @@ jobs:
     name: Generate SBOM
     runs-on: ubuntu-latest
     outputs:
-      sbom_artifact: ${{ steps.upload-artifact.outputs.artifact-name}}
+      sbom_artifact: "sbom_${{ github.run_id }}"
     permissions:
       contents: read
     steps:
