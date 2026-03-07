@@ -1,1 +1,24 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sbom:
+    uses: ./.github/workflows/sbom.yml
+    permissions:
+      contents: read
+
+  sca:
+    uses: ./.github/workflows/sca.yml
+    needs: [ sbom ]
+    with:
+      sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
+    permissions:
+      contents:read
+
 

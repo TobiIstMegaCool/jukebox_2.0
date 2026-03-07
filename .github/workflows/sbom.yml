@@ -1,1 +1,32 @@
+name: SBOM Generation
 
+on:
+  workflow_call:
+
+jobs:
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    outputs:
+      sbom_artifact: ${{ steps.upload-artifact.outputs.artifact-name}}
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+
+      - name: Upload SBOM artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: sbom_${{ github.run_id }}
+          path: sbom.spdx.json
+          retention-days: 30

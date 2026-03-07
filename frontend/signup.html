@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+            font-family: Arial, sans-serif;
+        }
+
+        .glass {
+            width: 330px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        input {
+            width: 95%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        a {
+            color: #fff;
+            font-size: 14px;
+            display: block;
+            margin-top: 12px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+   <div class="glass-card">
+    <h2>Jukeboxd Signup</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="signup()">Create Account</button>
+
+    <!-- Link to login page -->
+    <a href="/login" 
+       style="color:#fff; margin-top:15px; display:block; text-decoration:underline;">
+       Already have an account? Login
+    </a>
+
+    <div id="error-msg" class="error"></div>
+ </div>
+
+  <script>
+    async function signup() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const res = await fetch("/api/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("Account created! Please login.");
+            window.location.href = "/login"; // redirect to login page
+        } else {
+            document.getElementById("error-msg").innerText = data.message;
+        }
+    }
+  </script>
+</body>
+</html>

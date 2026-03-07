@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jukebox Movie Reviews</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .star-icon { cursor: pointer; transition: color 0.2s, transform 0.1s; }
+        .star-icon:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+<div id="app-container" class="w-full max-w-4xl bg-white shadow-2xl rounded-xl">
+
+    <!-- Loading -->
+    <div id="loading-view" class="p-8 text-center">
+        <h2 class="text-xl font-semibold text-gray-700">Loading...</h2>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-view" class="hidden p-6 space-y-8">
+       <header class="bg-indigo-700 p-6 rounded-t-xl shadow-lg flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-white">Jukebox Songs Review Hub</h1>
+        <p id="user-info" class="text-xs text-indigo-300 mt-2"></p>
+     </div>
+     <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        Logout
+     </button>
+      </header>
+
+
+        <!-- Review Form -->
+        <div class="bg-gray-100 p-5 rounded-lg border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Add a New Review</h2>
+            <form id="review-form" class="space-y-4">
+                <div>
+                    <label for="movie-title">Song Title</label>
+                    <input type="text" id="movie-title" required class="w-full p-3 border rounded-lg">
+                </div>
+                <div>
+                    <label for="review-text">Your Review</label>
+                    <textarea id="review-text" rows="3" required class="w-full p-3 border rounded-lg"></textarea>
+                </div>
+                <div>
+                    <label>Star Rating (1-5)</label>
+                    <div id="star-rating" class="flex space-x-1"></div>
+                    <input type="hidden" id="star-input" value="0">
+                </div>
+                <button type="submit" id="submit-button" class="w-full bg-indigo-600 text-white py-3 rounded-lg">Submit Review</button>
+            </form>
+        </div>
+
+        <!-- Reviews List -->
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-800">Latest Reviews</h2>
+            <div id="reviews-list" class="space-y-4">
+                <p id="no-reviews" class="text-gray-500 italic">No reviews yet.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+let editingReviewId = null; // tracks which review is being edited
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userId = "local-test-user";
+    const appId = "default-app-id";
+    const API_ENDPOINT = "/api/reviews";
+
+    // Show main UI
+    function renderUI() {
+        document.getElementById('loading-view').classList.add('hidden');
+        document.getElementById('main-view').classList.remove('hidden');
+        document.getElementById('user-info').textContent = `User ID: ${userId}`;
+    }
+
+    // Star rating
+    function setupStarRating() {
+        const container = document.getElementById('star-rating');
+        const input = document.getElementById('star-input');
+        container.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const span = document.createElement('span');
+            span.className = 'star-icon text-gray-300';
+            span.innerHTML = '★';
+            span.addEventListener('mouseover', () => updateStars(i));
+            span.addEventListener('mouseout', () => updateStars(parseInt(input.value)));
+            span.addEventListener('click', () => { input.value = i; updateStars(i); });
+            container.appendChild(span);
+        }
+        function updateStars(n) {
+            Array.from(container.children).forEach((s, idx) => {
+                s.classList.toggle('text-yellow-400', idx < n);
+                s.classList.toggle('text-gray-300', idx >= n);
+            });
+        }
+        updateStars(0);
+    }
+
+function createReviewCard(r) {
+    const div = document.createElement('div');
+    div.className = 'bg-white p-5 border-l-4 border-indigo-500 rounded-lg shadow-md flex justify-between items-start';
+
+    // Left: delete button
+    const left = document.createElement('div');
+    left.className = 'mr-4';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600';
+    delBtn.textContent = '❌';
+    left.appendChild(delBtn);
+
+    // Right: review content + edit button
+    const right = document.createElement('div');
+    right.className = 'flex-1';
+    right.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold text-gray-900">${r.title}</h3>
+            <div>${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+        </div>
+        <p class="text-gray-700 mb-2">${r.reviewText}</p>
+        <p class="text-xs text-gray-400 mb-2">
+            Created: ${new Date(r.createdAt).toLocaleString()}
+            ${r.updatedAt ? ` | Updated: ${new Date(r.updatedAt).toLocaleString()}` : ''}
+        </p>
+    `;
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600';
+    editBtn.textContent = '✏️';
+    right.appendChild(editBtn);
+
+    div.appendChild(left);
+    div.appendChild(right);
+
+    // --- Delete functionality ---
+    delBtn.addEventListener('click', async () => {
+        if (!confirm("Are you sure you want to delete this review?")) return;
+        try {
+            await fetch(`${API_ENDPOINT}/${r.id}`, { method: 'DELETE' });
+            fetchReviews();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to delete review');
+        }
+    });
+
+    // --- Edit functionality ---
+    editBtn.addEventListener('click', () => {
+    // Fill the form with the selected review data
+    document.getElementById('movie-title').value = r.title;
+    document.getElementById('review-text').value = r.reviewText;
+    document.getElementById('star-input').value = r.stars;
+    setupStarRating();
+
+    // Set the global editing ID
+    editingReviewId = r.id;
+
+    // Update the submit button text
+    document.getElementById('submit-button').textContent = 'Update Review';
+});
+
+
+    return div;
+}
+
+    async function fetchReviews() {
+    const list = document.getElementById('reviews-list');
+    const noReviews = document.getElementById('no-reviews');
+
+    if (!list) return console.error('reviews-list element not found');
+
+    try {
+        const res = await fetch(`${API_ENDPOINT}?userId=${userId}&appId=${appId}`);
+        const data = await res.json();
+        list.innerHTML = '';
+
+        if (!Array.isArray(data) || data.length === 0) {
+            if (noReviews) noReviews.classList.remove('hidden');
+        } else {
+            if (noReviews) noReviews.classList.add('hidden');
+            data.forEach(r => list.appendChild(createReviewCard(r)));
+        }
+    } catch(e) {
+        console.error("Error fetching reviews:", e);
+        list.innerHTML = '<p class="text-red-500">Failed to load reviews.</p>';
+    }
+}
+
+    document.getElementById('review-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('movie-title').value.trim();
+    const text = document.getElementById('review-text').value.trim();
+    const stars = parseInt(document.getElementById('star-input').value);
+
+    if (!title || !text || stars < 1 || stars > 5) return alert('Fill all fields and select stars');
+
+    const btn = document.getElementById('submit-button');
+    btn.disabled = true;
+    btn.textContent = editingReviewId ? 'Updating...' : 'Submitting...';
+
+    try {
+        let res;
+        if (editingReviewId) {
+            // PATCH update
+            res = await fetch(`${API_ENDPOINT}/${editingReviewId}`, {
+                method: 'PATCH',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ title, reviewText: text, stars })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to update review');
+            }
+            editingReviewId = null; // reset after update
+        } else {
+            // POST new review
+            res = await fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ userId, appId, title, reviewText: text, stars })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to submit review');
+            }
+        }
+
+        // Reset form
+        document.getElementById('review-form').reset();
+        document.getElementById('star-input').value = '0';
+        setupStarRating();
+        fetchReviews();
+    } catch (e) {
+        console.error(e);
+        alert(editingReviewId ? 'Failed to update review' : 'Failed to submit review');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Review';
+    }
+
+    });
+
+      document.getElementById('logout-button').addEventListener('click', () => {
+    // For now, just redirect to login page or call your backend logout
+    // If you have a Flask route /logout:
+    window.location.href = "/logout";
+    });
+
+    // Start app
+    renderUI();
+    setupStarRating();
+    fetchReviews();
+});
+</script>
+
+</body>
+</html>

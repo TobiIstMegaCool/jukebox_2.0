@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jukeboxd – Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(135deg, #0f2a47, #2c6ecf);
+            background-size: cover;
+        }
+
+        .glass-card {
+            width: 350px;
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            color: #fff;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .error {
+            margin-top: 10px;
+            color: #ffbdbd;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+ <div class="glass-card">
+    <h2>Jukeboxd Login</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <!-- Link to signup page -->
+    <a href="/signup" 
+       style="color:#fff; margin-top:15px; display:block; text-decoration:underline;">
+       Create a new account
+    </a>
+
+    <div id="error-msg" class="error"></div>
+ </div>
+
+
+    <script>
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                window.location.href = "/";  // redirect to main page
+            } else {
+                document.getElementById("error-msg").innerText = data.message;
+            }
+        }
+    </script>
+
+</body>
+</html>
