@@ -23,4 +23,5 @@ jobs:
 
   secrets:
     uses: ./.github/workflows/secrets.yml
-    permissions: read-all
+    permissions:
+      contents: read
