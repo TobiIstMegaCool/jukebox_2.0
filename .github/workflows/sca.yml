@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Vulnerability Scan
         run: |
-          grype sbom:./sbom/${{ inputs.sbom_artifact }}/sbom.spdx.json -o json > sca.json
+          grype sbom:./sbom/sbom.spdx.json -o json > sca.json
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
