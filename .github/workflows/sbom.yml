@@ -3,7 +3,10 @@ name: SBOM Generation
 on:
   workflow_dispatch: 
   workflow_call:
-
+    outputs:                         
+      sbom_artifact:
+        description: 'Artifact name'
+        value: ${{ jobs.sbom.outputs.sbom_artifact }}
 jobs:
   sbom:
     name: Generate SBOM
@@ -14,7 +17,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
