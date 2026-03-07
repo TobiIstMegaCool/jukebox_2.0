@@ -21,6 +21,11 @@ jobs:
     permissions:
       contents: read
 
+  sast:
+    uses: ./.github/workflows/sast.yml
+    permissions: 
+      contents: read
+      
   secrets:
     uses: ./.github/workflows/secrets.yml
     permissions:
