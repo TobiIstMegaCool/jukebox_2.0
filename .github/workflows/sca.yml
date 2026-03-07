@@ -24,9 +24,8 @@ jobs:
           name: ${{ inputs.sbom_artifact }}
           path: ./sbom
 
-      - name: Debug - Input value
-        run: |
-          echo "Artifact name: ${{ inputs.sbom_artifact }}"
+      - name: Debug - List files
+        run: find ./sbom -type f
       
       - name: Install Grype
         run: |
