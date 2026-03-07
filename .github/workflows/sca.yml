@@ -6,6 +6,7 @@ on:
       sbom_artifact:
         description: 'Name of the SBOM artifact to scan'
         required: true
+        type: string
 
 jobs:
   grype-scan:
@@ -29,11 +30,11 @@ jobs:
 
       - name: Run Vulnerability Scan
         run: |
-          grype sbom:./sbom/sbom.spdx.json -o json > vulnerabilities.json
+          grype sbom:./sbom/sbom.spdx.json -o json > sca.json
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
         with:
-          name: vulnerabilities_${{ github.run_id }}
-          path: vulnerabilities.json
+          name: sca_${{ github.run_id }}
+          path: sca.json
           retention-days: 30
