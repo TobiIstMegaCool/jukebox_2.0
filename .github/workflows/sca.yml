@@ -24,16 +24,13 @@ jobs:
           name: ${{ inputs.sbom_artifact }}
           path: ./sbom
 
-      - name: Debug - List files        # ← temporär hinzufügen
-        run: find ./sbom -type f
-
       - name: Install Grype
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Run Vulnerability Scan
         run: |
-          grype sbom:./sbom/sbom.spdx.json -o json > sca.json
+          grype sbom:./sbom/${{ inputs.sbom_artifact }}/sbom.spdx.json -o json > sca.json
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
