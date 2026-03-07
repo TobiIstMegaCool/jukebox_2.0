@@ -16,13 +16,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          path: ./backend
-          format: spdx-json
-          output-file: sbom.spdx.json
-          upload-artifact: false
+          python-version: '3.11'
+
+      - name: Create virtual environment
+        run: python -m venv venv
+
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Generate SBOM
+        run: |
+          source venv/bin/activate
+          syft python:venv -o spdx-json > sbom.spdx.json
 
       - name: Upload SBOM artifact
         id: upload-artifact
