@@ -29,10 +29,9 @@ jobs:
           source venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
-
-      - name: Generate SBOM
-        run: |
-          source venv/bin/activate
+          # Syft installieren
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+          # SBOM erstelllen
           syft python:venv -o spdx-json > sbom.spdx.json
 
       - name: Upload SBOM artifact
