@@ -18,15 +18,13 @@ jobs:
     needs: [ sbom ]
     with:
       sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
 
   sast:
     uses: ./.github/workflows/sast.yml
     permissions: 
       contents: read
+      security-events: write
+      actions: read
       
   secrets:
     uses: ./.github/workflows/secrets.yml
