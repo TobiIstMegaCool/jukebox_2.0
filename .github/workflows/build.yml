@@ -35,6 +35,6 @@ jobs:
       - name: Upload backend artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: build-artifacts-${{ matrix.component }}-${{ github.run_id }}
+          name: build_backend_artifact-${{ github.run_id }}
           path: ./backend
           retention-days: 7
