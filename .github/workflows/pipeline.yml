@@ -19,6 +19,6 @@ jobs:
     with:
       sbom_artifact: ${{ needs.sbom.outputs.sbom_artifact }}
     permissions:
-      contents:read
+      contents: read
 
 
