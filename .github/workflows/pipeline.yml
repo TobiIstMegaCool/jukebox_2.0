@@ -30,3 +30,8 @@ jobs:
     uses: ./.github/workflows/secrets.yml
     permissions:
       contents: read
+
+  build:
+    uses: ./.github/workflows/secrets.yml
+    permissions: 
+      contents: read
