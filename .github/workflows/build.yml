@@ -2,7 +2,6 @@ name: Build Flask Application
 
 on:
   workflow_call:
-  workflow_dispatch: 
 
 jobs:
   build:
@@ -14,14 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      # --- Frontend: Kein Build nötig ---
-      - name: Upload frontend artifacts
-        uses: actions/upload-artifact@v5
-        with:
-          name: build_frontend_artifact-${{ github.run_id }}
-          path: ./frontend
-          retention-days: 7
-
       # --- Backend: Wie bisher ---
       - name: Setup Python (Backend)
         uses: actions/setup-python@v5
@@ -29,12 +20,12 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies (Backend)
-        working-directory: ./backend
+        working-directory: ./server
         run: pip install -r requirements.txt
 
       - name: Upload backend artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: build_backend_artifact-${{ github.run_id }}
-          path: ./backend
+          name: build_server_artifact-${{ github.run_id }}
+          path: ./server
           retention-days: 7
