@@ -32,6 +32,6 @@ jobs:
       contents: read
 
   build:
-    uses: ./.github/workflows/secrets.yml
+    uses: ./.github/workflows/build.yml
     permissions: 
       contents: read
