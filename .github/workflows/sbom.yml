@@ -31,7 +31,7 @@ jobs:
         run: |
           source venv/bin/activate
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          pip install -r server/requirements.txt
           # Syft installieren
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
           # SBOM erstelllen
