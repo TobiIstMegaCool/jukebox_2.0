@@ -24,9 +24,6 @@ jobs:
           name: ${{ inputs.sbom_artifact }}
           path: ./sbom
 
-      - name: Debug - List files
-        run: find ./sbom -type f
-      
       - name: Install Grype
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
