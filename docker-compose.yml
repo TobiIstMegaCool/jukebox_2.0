@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # Flask-Backend
+  backend:
+    build: .
+    ports:
+      - "5000:5000"  # Flask-Port
+    environment:
+      - FLASK_ENV=development
+      - DB_HOST=postgres  # Name des DB-Service (Docker-Netzwerk)
+      - DB_NAME=jukebox
+      - DB_USER=jukebox
+      - DB_PASSWORD=jukebox
+      - DB_PORT=5432
+    depends_on:
+      - postgres  # Wartet, bis die DB bereit ist
+    volumes:
+      - ./backend:/app  # Mountet deinen lokalen Code (für Live-Updates)
+    command: python app.py  # Überschreibt CMD aus dem Dockerfile (nur für Tests)
+
+  # PostgreSQL-Datenbank
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: jukebox
+      POSTGRES_USER: jukebox
+      POSTGRES_PASSWORD: jukebox
+    ports:
+      - "5432:5432"  # Optional: DB-Port nach außen freigeben
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistente Daten
+
+# Volumes für persistente Daten
+volumes:
+  postgres_data:
