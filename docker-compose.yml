@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Flask-Backend
   backend:
-    build: .
+    build: ./server
     ports:
       - "5000:5000"  # Flask-Port
     environment:
@@ -15,9 +15,6 @@ services:
       - DB_PORT=5432
     depends_on:
       - postgres  # Wartet, bis die DB bereit ist
-    volumes:
-      - ./backend:/app  # Mountet deinen lokalen Code (für Live-Updates)
-    command: python app.py  # Überschreibt CMD aus dem Dockerfile (nur für Tests)
 
   # PostgreSQL-Datenbank
   postgres:
@@ -28,9 +25,4 @@ services:
       POSTGRES_PASSWORD: jukebox
     ports:
       - "5432:5432"  # Optional: DB-Port nach außen freigeben
-    volumes:
-      - postgres_data:/var/lib/postgresql/data  # Persistente Daten
 
-# Volumes für persistente Daten
-volumes:
-  postgres_data:

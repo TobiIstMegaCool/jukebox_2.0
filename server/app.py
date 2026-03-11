@@ -16,7 +16,7 @@ import html
 # -----------------------------
 # APP SETUP
 # -----------------------------
-app = Flask(__name__, template_folder='../frontend')
+app = Flask(__name__, template_folder='./static/')
 CORS(app,
     resources={
         r"/api/*": {
