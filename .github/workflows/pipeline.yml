@@ -42,3 +42,13 @@ jobs:
       contents: read
       packages: write
       security-events: write
+
+  signing:
+    needs: [container_build]
+    uses: ./.github/workflows/sign-image.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    with:
+      backend-image-digest: ${{ needs.container_build.outputs.backend-image-digest }}
